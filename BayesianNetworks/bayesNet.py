@@ -1,5 +1,6 @@
 #Author: Ashish Jain
-#This script loads the data file for bayes net and learns the join probabilities.
+#Course: CMPSCI 688 (Probabilistic Graphical Models)
+#This script loads the data file for bayes net and learns the joint probabilities.
 
 import sys
 import os
@@ -40,7 +41,7 @@ def initialize():
     graph['CP'] = ['HD']
     graph['EIA'] = ['HD']
     graph['ECG'] = ['HD']
-    graph['HR'] = ['HD', 'A']
+    graph['HR'] = ['A', 'HD']
 
 
     #defining order in which variables from data files would be read
@@ -90,7 +91,7 @@ def compute_counts(data):
 
 def learn_graph():
 
-    lines =  open('Data/data-train-1.txt', "r").readlines()
+    lines =  open('Data/data-train-'+sys.argv[1]+'.txt', "r").readlines()
     
     for index in xrange(0, len(lines), 1):
         data = {}
@@ -139,10 +140,10 @@ def findQuery():
 
     """ Solving the first query"""
 
-    Query11 = {'A': '2', 'G':'2', 'CH':'1', 'CP':'4', 'BP' : '1', 'ECG' : '1', 'HR' : '1', 'EIA' : '1', 'HD' : '1'} 
+    Query11 = {'A': '2', 'G':'2', 'CH':'2', 'CP':'4', 'BP' : '1', 'ECG' : '1', 'HR' : '1', 'EIA' : '1', 'HD' : '1'} 
     numerator = solveQuery(Query11)
     #print numerator
-    Query12 = {'A': '2', 'G':'2', 'CH':'2', 'CP':'4', 'BP' : '1', 'ECG' : '1', 'HR' : '1', 'EIA' : '1', 'HD' : '1'}
+    Query12 = {'A': '2', 'G':'2', 'CH':'1', 'CP':'4', 'BP' : '1', 'ECG' : '1', 'HR' : '1', 'EIA' : '1', 'HD' : '1'}
     denominator =  solveQuery(Query12)
     #print denominator
     print float(numerator/(numerator+denominator))
@@ -151,7 +152,7 @@ def findQuery():
 
     numerator=0.0
     denominator=0.0
-    Query2 = {'A': '2', 'CH':'2', 'CP':'1', 'BP' : '1', 'ECG' : '1', 'HR' : '2', 'EIA' : '2', 'HD' : '1'}
+    Query2 = {'A': '2', 'CH':'2', 'CP':'1', 'BP' : '2', 'ECG' : '1', 'HR' : '2', 'EIA' : '2', 'HD' : '1'}
     for value in variable_values['G']:
         Query2['G'] = value
         numerator+=solveQuery(Query2)
@@ -164,7 +165,7 @@ def findQuery():
 
 def classification():
 
-   lines =  open('Data/data-test-6.txt', "r").readlines()
+   lines =  open('Data/data-test-'+sys.argv[1]+'.txt', "r").readlines()
  
    correct = 0
    total = 0
@@ -197,8 +198,8 @@ def main():
     #findCPT('HD')
     #findCPT('HR')
 
-    findQuery()
-    #classification()
+    #findQuery()
+    classification()
 
 if __name__ == "__main__":
     main()
