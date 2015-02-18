@@ -55,7 +55,7 @@
 
 %%% The "real" document content comes below...
 
-\title{Assignment-1}
+\title{Assignment-1, CMPSCI 688}
 \author{Ashish Jain}
 %\date{} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
@@ -70,8 +70,8 @@ P(X) = \prod_{i=1}^{N} P(X_i | Pa_{X_i}^{G}) \\
 \end{align*}
 Using the above equation, we can write the factorization for the given graph as follows:
 \begin{align*}
-P(A,G,BP,CH,HD,CP,EIA,ECG,HR) &= P(G)P(A)P(BP|G)P(CH|G, A)P(HD|BP, CH)P(HR|A, HD)\\
-						      & P(CP|HD)P(EIA|HD)P(ECG|HD)
+P(A,G,BP,CH,HD,CP,EIA,ECG,HR) &= P(G).P(A).P(BP|G).P(CH|G, A).P(HD|BP, CH).P(HR|A, HD)\\
+						      & P(CP|HD).P(EIA|HD).P(ECG|HD)
 \end{align*}
 \section*{Question 2. Likelihood Function}
 
@@ -149,14 +149,14 @@ P(HD$|$BP, CH) & HD & BP   & CH   \\ \hline
 P(HR$|$A, HD) & HR   & A      & HD \\ \hline
 0.0606        & Low  & $<$45  & N  \\ \hline
 0.9393        & High & $<$45  & N  \\ \hline
-0.6           & Low  & 45-55 & N  \\ \hline
-0.4           & High & 45-55 & N  \\ \hline
-0.173         & Low  & $>=$55 & N  \\ \hline
-0.8269        & High & $>=$55 & N  \\ \hline
-0.5217        & Low  & $<$45 & Y  \\ \hline
-0.4782        & High & $<$45 & Y  \\ \hline
-0.3333        & Low  & 45-55 & Y  \\ \hline
-0.6666        & High & 45-55 & Y  \\ \hline
+0.173         & Low  & 45-55 & N  \\ \hline
+0.8269        & High & 45-55 & N  \\ \hline
+0.3333        & Low  & $>=$55 & N  \\ \hline
+0.6666        & High & $>=$55 & N  \\ \hline
+0.6           & Low  & $<$45 & Y  \\ \hline
+0.4           & High & $<$45 & Y  \\ \hline
+0.5217        & Low  & 45-55 & Y  \\ \hline
+0.4782        & High & 45-55 & Y  \\ \hline
 0.5714        & Low  & $>=$55 & Y  \\ \hline
 0.4285        & High & $>=$55 & Y  \\ \hline
 \end{tabular}
@@ -170,51 +170,56 @@ P(A,B) &= P(A|B).P(B)
 Random variable CH (cholestrol) can take following two values: Low and High. Let us solve the query using $CH=L$ using the above joint probability equation.
  \begin{flalign*}
   P(CH = L | A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No) = \\
-  \dfrac{P(CH = L, A = 2, G = M, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No)}
-          {P(A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No)} =   \\
-   \dfrac{P(CH = L, A = 2, G = M, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = no, HD = no) }
-          {\sum_{ch \in (L, H) }P(CH = ch, A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = no, HD = no} = \tag{\text{marginalizing over CH} }\\
+  \dfrac{P(CH = L, A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No)}
+          {P(A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No)} =   \\ \\
+   \dfrac{P(CH = L, A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No) }
+          {\sum_{ch \in (L, H) }P(CH = ch, A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No)} = \tag{\text{marginalizing over CH} }\\ \\
    \dfrac{P(CH = L | A = 2, G = M)P(HD = L | CH = L, BP = L)}{\sum_{ch \in (L, H)} P(CH = ch | A = 2, G = M) P(HD = L| CH = ch, BP = L)} 
       = \tag{\text{Using factorization and conditional independence property, terms indepedent of CH will get cancelled out.} } \\
  \end{flalign*} \\
- By using learned CPT tables in Part 4 over training file 1, we get following answer for this Query: \\
- $P(CH = L | A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No) = $0.1522  \\
- $P(CH = R | A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No) = $0.8477  \\
+ By using learned CPT tables in Part 4 over training file 1, we get following answer for this Query: \\ \\
+ {\small {
+ $P(CH = L | A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No) = $0.1522 }} \\
+ {\small{
+ $P(CH = H | A = 2, G = M, CP = None, BP = L, ECG = Normal, HR = L, EIA = No, HD = No) = $0.8477 }}  \\
 \subsection*{(b)}
 BP can take two values: Low and High. Let us solve the expression for $BP=L$. We have unobserved variable $G$ in this Query. \\
 \begin{gather*}
   P(BP =L | A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No) =\\  
   \dfrac{P(BP = L, A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No)}
-          {\sum_{bp} P(BP = bp, A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No)} = \tag{\text{marginalizing over $BP$ in denominator} }\\ 
+          {\sum_{bp} P(BP = bp, A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No)} = \tag{\text{marginalizing over $BP$ in denominator} }\\ \\
   \dfrac{\sum_{g} P(BP = L, A = 2, G = g, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No)}
     {\sum_{bp} \sum_{g} P(BP = bp, A = 2, G = g, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No)}
     \tag{\text{marginalizing over unobserved variable $G$ in denominator and numerator.} }\\ 
 \end{gather*}\\
 Finally we get after applying factorization and canceling out the terms in numerator and denominator  :\\
-{\tiny{
+\tiny
 \begin{gather*}
+\boxed{
 \dfrac{\sum_{g} P(G=g) P(CH=H|G=g, A=2) P(BP=L|G=g) P(HR=H|A=2, BP=L, HD=No)P(HD=No| BP=L, CH=H)}
-    {\sum_{bp} \sum_{g} P(G=g) P(CH=H | G=g, A=2) P(BP=bp | G=g) P(HR=H| A=2, BP=bp, HD=No)P(HD=No| BP=bp, CH=H)}
-\end{gather*}\\
-}}
-Using the CPT tables learned on training file 1 in Question4, we get \\
+    {\sum_{bp} \sum_{g} P(G=g) P(CH=H | G=g, A=2) P(BP=bp | G=g) P(HR=H| A=2, BP=bp, HD=No)P(HD=No| BP=bp, CH=H)}}
+\end{gather*}
+\normalsize
+Using the CPT tables learned on training file 1 in Question4, we get \\ \\
+\small
 $P(BP=L | A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No) =$ 0.4685\\
-$P(BP=R | A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No) =$ 0.5314\\
+$P(BP=H | A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No) =$ 0.5314\\
+\normalsize
 
 \section*{6. Classification}
 \subsection*{(b)}
 To simplify: $P(HD=hd|A=a, G=g, BP=bp,  CH=ch, CP=cp, EIA = eia, ECG=ecg, HR=hr)$
 $hd \in {No, Yes}$
-{\tiny{
 \begin{gather*}
 P(HD=hd|A=a, G=g, BP=bp,  CH=ch, CP=cp, EIA = eia, ECG=ecg, HR=hr)  \\
 = \dfrac{P(A=a, G=g, BP=bp,  CH=ch, HD=hd, CP=cp, EIA = eia, ECG=ecg, HR=hr)} {\sum_{hd}P(A=a, G=g, BP=bp,  CH=ch, CP=cp, EIA = eia, ECG=ecg, HR=hr)} \\
-\tag{\text{Simplifying the expression for $hd=Y$.}} \\
-= \boxed{\dfrac{P(HD=Y| BP=bp, CH=ch).P(HR=hr|A=a,HD=Y).P(CP=cp|HD=Y).P(EIA=eia|HD=Y).P(ECG=ecg|HD=Y)}{\sum_{hd}P(HD=hd| BP=bp, CH=ch).P(HR=hr|A=a,HD=hd).P(CP=cp|HD=hd).P(EIA=eia|HD=hd).P(ECG=ecg|HD=hd)}}
+\tag{\text{Simplifying the expression for $hd=Y$.}} \\ \\
+= 
+\tiny \boxed{\dfrac{P(HD=Y| BP=bp, CH=ch).P(HR=hr|A=a,HD=Y).P(CP=cp|HD=Y).P(EIA=eia|HD=Y).P(ECG=ecg|HD=Y)}{\sum_{hd}P(HD=hd| BP=bp, CH=ch).P(HR=hr|A=a,HD=hd).P(CP=cp|HD=hd).P(EIA=eia|HD=hd).P(ECG=ecg|HD=hd)}}
+\normalsize
 \tag{\text{Simplifying the expression using properties of conditional Independence.}} \\
 \tag{\text{Probability terms independent of $HD$ in numerator and denominator will get cancelled out.}}\\
-\end{gather*}}}
-
+\end{gather*}
 \subsection*{(c)}
 \begin{tabular}{|c|c|c|c|}\hline
 Fold & Correct & Total & $Accuracy(\%) $  \\ \hline
@@ -254,6 +259,6 @@ Mean & 45.8 & 60 & 76.33 \\\hline
 \end{tabular}
 \\ \\
 Mean Prediction accuracy over the five test files $=76.33$. \\
-Standard deviation of the prediction accuracy over the five test files $=5.61$. \\
+Standard deviation of the prediction accuracy over the five test files $=5.61$. \\ \\
 Accuracy of above designed network is better than the original network. We removed irrelevant relationships between variables and introduced new causal relationship. \\
 \end{document}

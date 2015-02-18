@@ -1,13 +1,14 @@
 #Author: Ashish Jain
 #Course: CMPSCI 688 (Probabilistic Graphical Models)
 #This script loads the data file for bayes net and learns the joint probabilities.
-#How to run this program: python bayesNet.py <arg1> <arg2>. arg1: path of training file. arg2: path of test file 
+#How to run this program?: python bayesNet.py <arg1> <arg2> 
+#arg1: path of training file. arg2: path of test file 
 
 '''
 Output: 
-Question 4:  It will output CPTs for A, BP, HD, HR
-Question 5:  Output for the two Queries
-Question 6:  Classification output for the given train and test file
+Question 4:  It will output CPTs for A, BP, HD, HR for the given training file
+Question 5:  Output for the two Queries for the given training file
+Question 6:  Classification output for the given training and test file
 '''
 
 import sys
@@ -49,7 +50,7 @@ def initialize():
     graph['CP'] = ['HD']
     graph['EIA'] = ['HD']
     graph['ECG'] = ['HD']
-    graph['HR'] = ['HD', 'A']
+    graph['HR'] = ['A', 'HD']
 
 
     #defining order in which variables from data files would be read
@@ -160,21 +161,19 @@ def solveQuery(query):
 
 def findQuery():
 
-    """ Solving the first query"""
+    """ Solving the first query for CH=Low"""
 
-    Query11 = {'A': '2', 'G':'2', 'CH':'2', 'CP':'4', 'BP' : '1', 'ECG' : '1', 'HR' : '1', 'EIA' : '1', 'HD' : '1'} 
+    Query11 = {'A': '2', 'G':'2', 'CH':'1', 'CP':'4', 'BP' : '1', 'ECG' : '1', 'HR' : '1', 'EIA' : '1', 'HD' : '1'} 
     numerator = solveQuery(Query11)
-    #print numerator
-    Query12 = {'A': '2', 'G':'2', 'CH':'1', 'CP':'4', 'BP' : '1', 'ECG' : '1', 'HR' : '1', 'EIA' : '1', 'HD' : '1'}
+    Query12 = {'A': '2', 'G':'2', 'CH':'2', 'CP':'4', 'BP' : '1', 'ECG' : '1', 'HR' : '1', 'EIA' : '1', 'HD' : '1'}
     denominator =  solveQuery(Query12)
-    #print denominator
-    print float(numerator/(numerator+denominator))
+    print "Solving the first query for CH=Low: " + str(float(numerator/(numerator+denominator)))
 
-    """ Solving the second query """
+    """ Solving the second query for BP=Low """
 
     numerator=0.0
     denominator=0.0
-    Query2 = {'A': '2', 'CH':'2', 'CP':'1', 'BP' : '2', 'ECG' : '1', 'HR' : '2', 'EIA' : '2', 'HD' : '1'}
+    Query2 = {'A': '2', 'CH':'2', 'CP':'1', 'BP' : '1', 'ECG' : '1', 'HR' : '2', 'EIA' : '2', 'HD' : '1'}
     for value in variable_values['G']:
         Query2['G'] = value
         numerator+=solveQuery(Query2)
@@ -183,7 +182,7 @@ def findQuery():
             Query2['BP'] = bp
             Query2['G'] = g
             denominator+=solveQuery(Query2)
-    print float(numerator/denominator)
+    print "Solving the second query for BP=Low: " + str(float(numerator/denominator))
 
 def classification():
 
@@ -211,8 +210,9 @@ def classification():
         elif prob2 > prob1 and true_class == '2':
             correct+=1
         total+=1
-   print correct
-   print total
+   print "Classification for " + sys.argv[2]
+   print "correct: " + str(correct)
+   print "total: " +  str(total)
 
 def main():
 
@@ -233,5 +233,6 @@ def main():
     print "\nQuestion6: Classification\n"
     classification()
     print
+
 if __name__ == "__main__":
     main()

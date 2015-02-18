@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  17 FEB 2015 18:41
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  18 FEB 2015 11:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -640,7 +640,7 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 64.
 (/usr/local/texlive/2013/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Overfull \hbox (20.6001pt too wide) in paragraph at lines 75--75
+Overfull \hbox (35.80846pt too wide) in paragraph at lines 75--75
 [] 
  []
 
@@ -667,65 +667,94 @@ Underfull \hbox (badness 10000) in paragraph at lines 117--164
  []
 
 [2]
-Overfull \hbox (25.86845pt too wide) in paragraph at lines 179--179
+Overfull \hbox (36.96536pt too wide) in paragraph at lines 179--179
 [] 
  []
 
 [3]
-Underfull \hbox (badness 10000) in paragraph at lines 179--183
+Underfull \hbox (badness 10000) in paragraph at lines 179--185
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 184--185
+Underfull \hbox (badness 10000) in paragraph at lines 179--185
 
  []
 
 
-Overfull \hbox (26.09393pt too wide) in paragraph at lines 192--192
+Underfull \hbox (badness 10000) in paragraph at lines 186--187
+
+ []
+
+
+Overfull \hbox (26.09393pt too wide) in paragraph at lines 194--194
 [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 192--195
+Underfull \hbox (badness 10000) in paragraph at lines 194--197
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 198--203
+Underfull \hbox (badness 10000) in paragraph at lines 201--208
 
  []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 201--208
+
+ []
+
+
+LaTeX Font Warning: Command \tiny invalid in math mode on input line 222.
+
+
+LaTeX Font Warning: Command \normalsize invalid in math mode on input line 222.
+
+
+
+LaTeX Font Warning: Command \tiny invalid in math mode on input line 222.
+
+
+LaTeX Font Warning: Command \normalsize invalid in math mode on input line 222.
+
 
 [4] <BayesNet.jpg, id=30, 963.6pt x 722.7pt>
 File: BayesNet.jpg Graphic file (type jpg)
  <use BayesNet.jpg>
-Package pdftex.def Info: BayesNet.jpg used on input line 233.
+Package pdftex.def Info: BayesNet.jpg used on input line 238.
 (pdftex.def)             Requested size: 481.79883pt x 361.3491pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 233--234
+Underfull \hbox (badness 10000) in paragraph at lines 238--239
 
  []
 
 [5]
-Overfull \hbox (20.6001pt too wide) in paragraph at lines 238--238
+Overfull \hbox (20.6001pt too wide) in paragraph at lines 243--243
 [] 
  []
 
-LaTeX Font Info:    Try loading font information for OMS+cmss on input line 241
+LaTeX Font Info:    Try loading font information for OMS+cmss on input line 246
 .
-LaTeX Font Info:    No file OMScmss.fd. on input line 241.
+LaTeX Font Info:    No file OMScmss.fd. on input line 246.
 
 LaTeX Font Warning: Font shape `OMS/cmss/m/n' undefined
 (Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbullet' on input line 241.
+(Font)              for symbol `textbullet' on input line 246.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 246--259
+Underfull \hbox (badness 10000) in paragraph at lines 251--264
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 246--259
+Underfull \hbox (badness 10000) in paragraph at lines 251--264
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 251--264
 
  []
 
@@ -735,13 +764,13 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 5159 strings out of 493315
- 74476 string characters out of 6137904
- 161053 words of memory out of 5000000
- 8506 multiletter control sequences out of 15000+600000
- 12591 words of font info for 48 fonts, out of 8000000 for 9000
+ 5165 strings out of 493315
+ 74551 string characters out of 6137904
+ 161065 words of memory out of 5000000
+ 8512 multiletter control sequences out of 15000+600000
+ 13950 words of font info for 54 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 44i,12n,43p,253b,240s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 44i,12n,43p,253b,206s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
 ></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex7.
 pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.p
@@ -754,14 +783,13 @@ cal/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local
 /texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/
 texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/t
 exlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmss17.pfb></usr/local/te
-xlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texl
-ive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texli
-ve/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive
-/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on assignment-1.pdf (7 pages, 204287 bytes).
+xlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/tex
+live/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texli
+ve/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
+Output written on assignment-1.pdf (7 pages, 195132 bytes).
 PDF statistics:
- 93 PDF objects out of 1000 (max. 8388607)
- 66 compressed objects within 1 object stream
+ 89 PDF objects out of 1000 (max. 8388607)
+ 63 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
