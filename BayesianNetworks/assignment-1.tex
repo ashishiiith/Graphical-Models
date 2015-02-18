@@ -14,7 +14,7 @@
 % See the LaTeX Companion or other references for full information.
 
 %%% PAGE DIMENSIONS
-\usepackage[margin=0.4in]{geometry} % to change the page dimensions
+\usepackage[margin=0.6in]{geometry} % to change the page dimensions
 \geometry{a4paper} % or letterpaper (US) or a5paper or....
 % \geometry{margin=2in} % for example, change the margins to 2 inches all round
 % \geometry{landscape} % set up the page for landscape
@@ -70,8 +70,8 @@ P(X) = \prod_{i=1}^{N} P(X_i | Pa_{X_i}^{G}) \\
 \end{align*}
 Using the above equation, we can write the factorization for the given graph as follows:
 \begin{align*}
-P(A,G,BP,CH,HD,CP,EIA,ECG,HR) &= P(G)P(BP|G)P(CH|G, A)P(HD|BP, CH)P(HR|A, HD)\\
-								&P(CP|HD)P(EIA|HD)P(ECG|HD)
+P(A,G,BP,CH,HD,CP,EIA,ECG,HR) &= P(G)P(A)P(BP|G)P(CH|G, A)P(HD|BP, CH)P(HR|A, HD)\\
+						      & P(CP|HD)P(EIA|HD)P(ECG|HD)
 \end{align*}
 \section*{Question 2. Likelihood Function}
 
@@ -86,7 +86,7 @@ P_{\theta}(X=x) = \prod_{d=1}^{D} P_{\theta}(X_{d} = x_{d}|X_{Pa(X_{d})} = x_{Pa
 \end{equation}
 Using the above two equations we will write the probability expression for the given graph and than take log of it.
 \begin{flalign*}
-P_{\theta}(A,G,BP,CH,HD,CP,EIA,ECG,HR) &= P_{\theta}(G=g)P_{\theta}(BP=bp|G=g)\\
+P_{\theta}(A,G,BP,CH,HD,CP,EIA,ECG,HR) &= P_{\theta}(A=a)P_{\theta}(G=g)P_{\theta}(BP=bp|G=g)\\
 & P_{\theta}(CH=ch|G=g, A=a)P_{\theta}(HD=hd|BP=bp, CH=ch)\\
 & P_{\theta}(HR=hr|A=a,HD=hd)P_{\theta}(CP=cp|HD=hd)\\
 & P_{\theta}(EIA=eia|HD=hd)P_{\theta}(ECG=ecg|HD=hd) \\ \\
@@ -197,18 +197,27 @@ Finally we get after applying factorization and canceling out the terms in numer
     {\sum_{bp} \sum_{g} P(G=g) P(CH=H | G=g, A=2) P(BP=bp | G=g) P(HR=H| A=2, BP=bp, HD=No)P(HD=No| BP=bp, CH=H)}
 \end{gather*}\\
 }}
-Using the CPT tables learned on training file 1 in Question4, we get \\ \\
-$P(BP =L | A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No) =$ 0.4685 \\
-$P(BP =R | A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No) =$ 0.5314 \\
+Using the CPT tables learned on training file 1 in Question4, we get \\
+$P(BP=L | A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No) =$ 0.4685\\
+$P(BP=R | A = 2, CP = Typical, CH = H, ECG = Normal, HR = H, EIA = Yes, HD = No) =$ 0.5314\\
 
 \section*{6. Classification}
 \subsection*{(b)}
+To simplify: $P(HD=hd|A=a, G=g, BP=bp,  CH=ch, CP=cp, EIA = eia, ECG=ecg, HR=hr)$
+$hd \in {No, Yes}$
+{\tiny{
+\begin{gather*}
+P(HD=hd|A=a, G=g, BP=bp,  CH=ch, CP=cp, EIA = eia, ECG=ecg, HR=hr)  \\
+= \dfrac{P(A=a, G=g, BP=bp,  CH=ch, HD=hd, CP=cp, EIA = eia, ECG=ecg, HR=hr)} {\sum_{hd}P(A=a, G=g, BP=bp,  CH=ch, CP=cp, EIA = eia, ECG=ecg, HR=hr)} \\
+\tag{\text{Simplifying the expression for $hd=Y$.}} \\
+= \boxed{\dfrac{P(HD=Y| BP=bp, CH=ch).P(HR=hr|A=a,HD=Y).P(CP=cp|HD=Y).P(EIA=eia|HD=Y).P(ECG=ecg|HD=Y)}{\sum_{hd}P(HD=hd| BP=bp, CH=ch).P(HR=hr|A=a,HD=hd).P(CP=cp|HD=hd).P(EIA=eia|HD=hd).P(ECG=ecg|HD=hd)}}
+\tag{\text{Simplifying the expression using properties of conditional Independence.}} \\
+\tag{\text{Probability terms independent of $HD$ in numerator and denominator will get cancelled out.}}\\
+\end{gather*}}}
 
 \subsection*{(c)}
-\subsection*{Part (c) : }
-
 \begin{tabular}{|c|c|c|c|}\hline
-Fold & Correct & Total & $Accuracy $  \\ \hline
+Fold & Correct & Total & $Accuracy(\%) $  \\ \hline
 1 & 44 & 60 & 73.33 \\ \hline
 2 & 48 & 60 & 80 \\ \hline
 3 & 40 & 60 & 66.66 \\ \hline
@@ -219,4 +228,32 @@ Mean & 45.4 & 60 & 75.66 \\\hline
 \vspace{1em} \\
 Mean Prediction accuracy over the five test files $=75.66$. \\
 Standard deviation of the prediction accuracy over the five test files $=5.12$.
+
+\section*{7. Modeling}
+\subsection*{(a)} \includegraphics[scale=0.5]{BayesNet.jpg} \\
+\subsection*{(b)} Factorization for above Bayes Net can be written as follows:
+\begin{align*}
+P(A,G,BP,CH,HD,CP,EIA,ECG,HR) &= P(A)P(G)P(BP|G, A)P(CH|G, A)P(HD|BP, CH)P(HR|HD)\\
+							  & P(CP|HD)P(EIA|HD)P(ECG|HD, HR)
+\end{align*}
+\subsection*{(c)} Some of the choices that went into desiging network structure:
+\begin{itemize}
+\item I removed some irrelevant factors like dependence relationship between Age (A) and HeartRate (HR). 
+\item Adding new factor or relationship between Age (A) and Blood Pressure (BP), Electrocardiograph (ECG) and Heart Rate (HR). It affect causal relationships between variables.
+\end{itemize}
+Hence overall the network is simplified as compared to the original given network.
+\subsection*{(d)}
+\begin{tabular}{|c|c|c|c|}\hline
+Fold & Correct & Total & $Accuracy(\%)$  \\ \hline
+1 & 44 & 60 & 73.33 \\ \hline
+2 & 49 & 60 & 81.66 \\ \hline
+3 & 40 & 60 & 66.66 \\ \hline
+4 & 48 & 60 & 80 \\ \hline
+5 & 48 & 60 & 80 \\ \hline
+Mean & 45.8 & 60 & 76.33 \\\hline
+\end{tabular}
+\\ \\
+Mean Prediction accuracy over the five test files $=76.33$. \\
+Standard deviation of the prediction accuracy over the five test files $=5.61$. \\
+Accuracy of above designed network is better than the original network. We removed irrelevant relationships between variables and introduced new causal relationship. \\
 \end{document}

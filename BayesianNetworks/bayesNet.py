@@ -1,6 +1,14 @@
 #Author: Ashish Jain
 #Course: CMPSCI 688 (Probabilistic Graphical Models)
 #This script loads the data file for bayes net and learns the joint probabilities.
+#How to run this program: python bayesNet.py <arg1> <arg2>. arg1: path of training file. arg2: path of test file 
+
+'''
+Output: 
+Question 4:  It will output CPTs for A, BP, HD, HR
+Question 5:  Output for the two Queries
+Question 6:  Classification output for the given train and test file
+'''
 
 import sys
 import os
@@ -41,7 +49,7 @@ def initialize():
     graph['CP'] = ['HD']
     graph['EIA'] = ['HD']
     graph['ECG'] = ['HD']
-    graph['HR'] = ['A', 'HD']
+    graph['HR'] = ['HD', 'A']
 
 
     #defining order in which variables from data files would be read
@@ -65,19 +73,23 @@ def initialize():
                 node_count[variable][pval] = 0
                 for nval in variable_values[variable]:
                     node_count[variable][(nval,)+pval] = 0 
-    #print node_count
 
 def get_variable(var):
-        
+    
+    #returns variable for the given index of the variable.
     return variable_index[var]
 
 def get_parents(var):
-        
+
+    #returns parents for a given random variable. 
     return graph[var]
 
 
 def compute_counts(data):
 
+    '''
+        stores the count for random variables which will be used for computing joint and conditional probabilities
+    '''
     global node_count
     for variable, val in data.items():
     
@@ -91,7 +103,11 @@ def compute_counts(data):
 
 def learn_graph():
 
-    lines =  open('Data/data-train-'+sys.argv[1]+'.txt', "r").readlines()
+    '''
+        traverses the graph and learn the dependencies and store variable counts for a given training file.
+    '''
+
+    lines =  open(sys.argv[1], "r").readlines()
     
     for index in xrange(0, len(lines), 1):
         data = {}
@@ -99,9 +115,12 @@ def learn_graph():
         for i in xrange(0, len(tokens)):
             data[variable_index[i]] = tokens[i]
         compute_counts(data)        
-    print node_count
 
-def findCPT(variable):
+def computeCPT(variable):
+
+    '''
+        for a given random variable it compute CPT
+    '''
 
     parents = get_parents(variable)
         
@@ -123,6 +142,9 @@ def findCPT(variable):
 
 def solveQuery(query):
 
+    '''
+        Solve a given query.
+    '''
     probability = 1.0
     for variable, parents in graph.items():
   
@@ -165,7 +187,11 @@ def findQuery():
 
 def classification():
 
-   lines =  open('Data/data-test-'+sys.argv[1]+'.txt', "r").readlines()
+   '''
+        For a given train and test file, this function computes the correct and total instances.
+   '''
+
+   lines =  open(sys.argv[2], "r").readlines()
  
    correct = 0
    total = 0
@@ -192,14 +218,20 @@ def main():
 
     initialize()
     learn_graph()
-    
-    #findCPT('A')
-    #findCPT('BP')
-    #findCPT('HD')
-    #findCPT('HR')
+    print "\nQuestion 4: CPT Output\n" 
+    computeCPT('A')
+    print
+    computeCPT('BP')
+    print
+    computeCPT('HD')
+    print
+    computeCPT('HR')
 
-    #findQuery()
+    print "\nQuestion5: Probability Queries\n"
+    findQuery()
+
+    print "\nQuestion6: Classification\n"
     classification()
-
+    print
 if __name__ == "__main__":
     main()
