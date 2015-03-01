@@ -1,0 +1,10 @@
+Question-1
+
+1.4 Most likely sequence
+
+trat
+0.79581876304
+hire
+0.996520492409
+riser
+0.937007141491
