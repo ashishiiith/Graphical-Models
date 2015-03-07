@@ -1,7 +1,10 @@
+#Author: Ashish Jain
+
 import os
 import sys
 import itertools
 from numpy import *
+from math import *
 
 char_ordering = {'e':0, 't':1, 'a':2, 'i':3, 'n':4, 'o':5, 's':6, 'h':7, 'r':8, 'd':9}
 
@@ -10,9 +13,11 @@ TP = [[0 for x in range(10)] for x in range(10)]  #transition parameter
 
 clique_potential = None
 beliefs = None
+size = 0
 
 forward_msg = {}
 backward_msg = {}
+marginal_distribution = None
 
 def load_FP(fname):
 
@@ -50,24 +55,24 @@ def compute_node_potential(fname):
 
 def clique_potential(fname, word):
 
-     global clique_potential 
+     global clique_potential
+     global size
+        
+     size = len(word)
+ 
      #clique_potential = [[[float (0.0) for x in range(10)] for x in range(10)] for x in range(len(word)-1)]
      clique_potential = zeros(shape=(len(word)-1, 10 ,10))
 
      node_potential = compute_node_potential(fname)
      for i in xrange(0, len(word)-1):
         #storing clique potential for each of the clique node
-        if i == len(word)-1:          
+        if i == len(word)-2:          
             clique_potential[i] = matrix(node_potential[i]).T  + matrix(node_potential[i+1]) + TP
         else: 
             clique_potential[i] = matrix(node_potential[i]).T + TP
-        #print clique_potential[i]
-     #print array(clique_potential[0][1]).flatten()[1]
      for i in xrange(0, len(word)-1):
          for char1 in ['t', 'a', 'h']:
-             #print char_ordering[char1]
              for char2 in ['t', 'a', 'h']:
-                 #print char_ordering[char2]
                  print str(clique_potential[i][char_ordering[char1]][char_ordering[char2]]) + " ",
              print
          print 
@@ -100,8 +105,8 @@ def sumproduct_message():
    
    '''Implementing backward message passing
    '''
-   backward_msg[3] = [0.0  for i in xrange(10)] 
-   for i in xrange(2, 0, -1):
+   backward_msg[size-1] = [0.0  for i in xrange(10)] 
+   for i in xrange(size-2, 0, -1):
         key = str(i+1) + "->"+str(i) 
         potential = clique_potential[i]
         backward_msg[i] = []
@@ -113,28 +118,86 @@ def logbeliefs():
     
     global beliefs
     
-    beliefs = zeros(shape=(3, 10, 10))
+    beliefs = zeros(shape=(size-1, 10, 10))
  
-    beliefs[0] = clique_potential[0] + matrix(backward_msg[1])
-    beliefs[1] = clique_potential[1] +  matrix(backward_msg[2]) + matrix(forward_msg[2]).T
-    beliefs[2] = clique_potential[2] + matrix(forward_msg[3]).T
+    for i in xrange(size-1):
+        
+        if i == 0:
+            beliefs[i] = clique_potential[i] +  matrix(backward_msg[i+1])
+        elif i == size-2:
+            beliefs[i] = clique_potential[i] + matrix(forward_msg[i+1]).T
+        else:
+            beliefs[i] = clique_potential[i] + matrix(backward_msg[i+1]) + matrix(forward_msg[i+1]).T
+    #beliefs[0] = clique_potential[0] + matrix(backward_msg[1])
+    #beliefs[1] = clique_potential[1] +  matrix(backward_msg[2]) + matrix(forward_msg[2]).T
+    #beliefs[2] = clique_potential[2] + matrix(forward_msg[3]).T
 
     for i in xrange(0, len(beliefs)): 
         for ch1 in ['t', 'a']:
             for ch2 in ['t', 'a']:
                 print ch1 + " : " + ch2 + " " + str(beliefs[i][char_ordering[ch1]][char_ordering[ch2]])
 
-def marginal_porbability():
+def marginal_probability():
 
+   global marginal_distribution
 
+   l = len(beliefs)
+   pairwise_marginal = zeros(shape=(l, 10, 10))
+   marginal_distribution = zeros(shape=(l+1, 10))
+   for i in xrange(l):
+        
+        normalizer = 0.0          
+        for ch1 in xrange(0, 10):
+            for ch2 in xrange(0, 10):
+                
+                normalizer+=exp(beliefs[i][ch1][ch2])
+        
+        for ch1 in xrange(0,10):
+            for ch2 in xrange(0,10):
+                
+                pairwise_marginal[i][ch1][ch2] = exp(beliefs[i][ch1][ch2])/normalizer
 
+        for ch1 in ['t', 'a', 'h']:
+            for ch2 in ['t', 'a', 'h']:
+                print ch1 + " : " + ch2 + " " + str(pairwise_marginal[i][char_ordering[ch1]][char_ordering[ch2]])
+       
+
+        for j in xrange(10):
+        
+            marginal_distribution[i][j] = sum(pairwise_marginal[i][j])
+            if i==l-1: 
+                marginal_distribution[i+1][j] = sum(pairwise_marginal[i,:,j])
+   
+   for i in xrange(l+1):
+        for j in char_ordering.keys(): 
+        
+                print str(j) + " " + str(marginal_distribution[i][char_ordering[j]]) + " ",
+        print
+
+def predict_character():
+
+    predicted_word = ""
+    for i in xrange(0, len(marginal_distribution)):
+        
+        index =  argmax(array(marginal_distribution[i]).flatten())
+        for char, order in char_ordering.items():
+        
+            if order==index:
+                predicted_word+=char
+    print predicted_word
+        
+ 
 def main():
 
     load_FP("model/feature-params.txt")
     load_TP("model/transition-params.txt")
 
+    #load_FP("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/model/feature-params.txt")
+    #load_TP("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/model/transition-params.txt")
+
     #Question 2.1
     clique_potential("data/test_img1.txt", "test")
+    #clique_potential("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/data/test_img5.txt", "strait")
 
     #Question 2.2
     sumproduct_message()
@@ -144,6 +207,10 @@ def main():
   
     #Question 2.4
     marginal_probability()
+
+    #Question 2.5
+    predict_character()    
+
 
 if __name__ == "__main__":
     main()
