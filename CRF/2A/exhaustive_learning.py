@@ -1,5 +1,6 @@
 #Author: Ashish Jain
-
+#How to Run code: python exhaustive_learning.py
+ 
 import os
 import commands
 import sys
@@ -41,10 +42,8 @@ def compute_node_potential(fname):
         vec = []
         for i in xrange(0, 10):
             vec.append(dot(FP[i], feature_vec))   #dot product of feature vector and learned feature parameter from model 
-        #print vec 
         node_potential.append(vec)
-    
-     #print node_potential 
+     print node_potential    
      return node_potential
 
 def negative_energy(fname, word):
@@ -58,7 +57,6 @@ def negative_energy(fname, word):
         np = node_potential[i][j] #node potential of position i in word for label j
         energy_potential += tp+np
     energy_potential += node_potential[len(word)-1][char_ordering[word[-1]]]
-    #print "energy " +  str(energy_potential)
     return float(energy_potential)
 
 def compute_log_partition(fname, word):
@@ -99,7 +97,6 @@ def marginal_probability(fname, true_word):
     count=0
     partition_func=float(0.0)
     label_energy = [[float(0.0) for x in range(10)] for x in range(len(true_word))] #[position][label]
-    #print label_energy 
     for combination in itertools.product(*vectors):
         count+=1
         word = ''.join(combination)    
@@ -107,8 +104,6 @@ def marginal_probability(fname, true_word):
         partition_func+=energy #add up entire energy
         for i in xrange(0, len(word)):
             label_energy[i][char_ordering[word[i]]] += energy #assign energy to a label at each position
-    #print label_energy
-    #print partition_func
     for i in xrange(0, len(true_word)):
         print str(i)+"  ", 
         for label in char_ordering.keys():    
@@ -120,32 +115,36 @@ def main():
     load_FP("model/feature-params.txt")
     load_TP("model/transition-params.txt")
 
-    #load_FP("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/model/feature-params.txt")
-    #load_TP("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/model/transition-params.txt")
-    
-    #Question-1.1
-    #print compute_node_potential("data/test_img1.txt")
 
+    print "Question 1.1"
+    #Question-1.1
+    print compute_node_potential("data/test_img1.txt")
+
+    print
+    print "Question-1.2"
     #Question-1.2
-    #negative_energy("data/test_img1.txt", "that")    
-    #negative_energy("data/test_img2.txt", "hire")    
-    #negative_energy("data/test_img3.txt", "rises")    
-    #compute_log_partition("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/data/test_img1.txt", "tree")    
-    #compute_log_partition("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/data/test_img2.txt", "net")    
-    #compute_log_partition("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/data/test_img3.txt", "trend")    
+    negative_energy("data/test_img1.txt", "that")    
+    negative_energy("data/test_img2.txt", "hire")    
+    negative_energy("data/test_img3.txt", "rises")    
   
+    print
+    print "Question-1.3"
     #Question-1.3 
     compute_log_partition("data/test_img1.txt", "that")
-    #compute_log_partition("data/test_img2.txt", "hire")
-    #compute_log_partition("data/test_img3.txt", "rises")
+    compute_log_partition("data/test_img2.txt", "hire")
+    compute_log_partition("data/test_img3.txt", "rises")
 
+    print
+    print "Question-1.4"
     #Question-1.4
-    #best_labeling_sequence("data/test_img1.txt", "that")
-    #best_labeling_sequence("data/test_img2.txt", "hire")
-    #best_labeling_sequence("data/test_img3.txt", "rises")
+    best_labeling_sequence("data/test_img1.txt", "that")
+    best_labeling_sequence("data/test_img2.txt", "hire")
+    best_labeling_sequence("data/test_img3.txt", "rises")
 
+    print
+    print "Question-1.5"
     #Question-1.5
-    #marginal_probability("data/test_img1.txt", "that")
+    marginal_probability("data/test_img1.txt", "that")
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,6 @@
 #Author: Ashish Jain
+#How to Run Code? python sumProduct.py <arg1> <arg2>
+#arg 1 - path of test image file, arg2 - test word corresponding to that test file
 
 import os
 import sys
@@ -19,8 +21,11 @@ forward_msg = {}
 backward_msg = {}
 marginal_distribution = None
 
-def load_FP(fname):
+correct_char = 0
+total_char = 0
 
+def load_FP(fname):
+    #loading feature parameters into a dictionary
     global FP
     lines = open(fname, "r").readlines()
     l = []
@@ -28,7 +33,7 @@ def load_FP(fname):
         FP[i] = map(lambda x: float(x), lines[i].strip().split())
 
 def load_TP(fname):
-
+    #loading transition parameter
     global TP
     y = 0
     for line in open(fname, "r"):
@@ -50,17 +55,17 @@ def compute_node_potential(fname):
             vec.append(dot(FP[i], feature_vec))   #dot product of feature vector and learned feature parameter from model  
         node_potential.append(vec)
 
-     #print node_potential 
+     print "Node Potential: " + str(node_potential) 
      return node_potential
 
-def clique_potential(fname, word):
+def compute_clique_potential(fname, word):
 
+     # computing clique potential corresponding to each of the clique in markov network
      global clique_potential
      global size
         
      size = len(word)
  
-     #clique_potential = [[[float (0.0) for x in range(10)] for x in range(10)] for x in range(len(word)-1)]
      clique_potential = zeros(shape=(len(word)-1, 10 ,10))
 
      node_potential = compute_node_potential(fname)
@@ -79,7 +84,6 @@ def clique_potential(fname, word):
 
 def logsumexp(vector):
 
-    #print vector
     c = max(vector)
     vector = map(lambda x : math.exp(x-c), vector)
     return c + math.log( sum(vector) )
@@ -128,9 +132,6 @@ def logbeliefs():
             beliefs[i] = clique_potential[i] + matrix(forward_msg[i+1]).T
         else:
             beliefs[i] = clique_potential[i] + matrix(backward_msg[i+1]) + matrix(forward_msg[i+1]).T
-    #beliefs[0] = clique_potential[0] + matrix(backward_msg[1])
-    #beliefs[1] = clique_potential[1] +  matrix(backward_msg[2]) + matrix(forward_msg[2]).T
-    #beliefs[2] = clique_potential[2] + matrix(forward_msg[3]).T
 
     for i in xrange(0, len(beliefs)): 
         for ch1 in ['t', 'a']:
@@ -154,7 +155,7 @@ def marginal_probability():
         
         for ch1 in xrange(0,10):
             for ch2 in xrange(0,10):
-                
+                #normalizing each value in belief table                
                 pairwise_marginal[i][ch1][ch2] = exp(beliefs[i][ch1][ch2])/normalizer
 
         for ch1 in ['t', 'a', 'h']:
@@ -162,6 +163,7 @@ def marginal_probability():
                 print ch1 + " : " + ch2 + " " + str(pairwise_marginal[i][char_ordering[ch1]][char_ordering[ch2]])
        
 
+        #adding up parisewise marginal probability along a row to compute marginal probability
         for j in xrange(10):
         
             marginal_distribution[i][j] = sum(pairwise_marginal[i][j])
@@ -174,8 +176,11 @@ def marginal_probability():
                 print str(j) + " " + str(marginal_distribution[i][char_ordering[j]]) + " ",
         print
 
-def predict_character():
+def predict_character(correct_word):
 
+    global correct_char
+    global total_char
+    #using marginal probability to predict character for a given state
     predicted_word = ""
     for i in xrange(0, len(marginal_distribution)):
         
@@ -184,33 +189,51 @@ def predict_character():
         
             if order==index:
                 predicted_word+=char
+
+    for j in xrange(0, len(predicted_word)):
+        if predicted_word[j] == correct_word[j]:
+            correct_char +=1 
+    total_char += len(correct_word)
     print predicted_word
         
  
-def main():
+def main_func():
 
     load_FP("model/feature-params.txt")
     load_TP("model/transition-params.txt")
 
-    #load_FP("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/model/feature-params.txt")
-    #load_TP("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/model/transition-params.txt")
-
     #Question 2.1
-    clique_potential("data/test_img1.txt", "test")
-    #clique_potential("/Users/ashishjain/Desktop/PGM/Assignments/pgm/Conditional Random Fields/Assignment2-PartA/Assignment2-PartA/data/test_img5.txt", "strait")
+    print "Question 2.1"
+    compute_clique_potential(sys.argv[1], sys.argv[2])
 
+    print
+    print "Question 2.2"
     #Question 2.2
     sumproduct_message()
     
+    print
+    print "Question 2.3"
     #Question 2.3
     logbeliefs()
   
+    print
+    print "Question 2.4"
     #Question 2.4
     marginal_probability()
 
+    print
+    print "Question 2.5"
     #Question 2.5
-    predict_character()    
-
-
+    predict_character(sys.argv[2])    
+   
+#def main():
+    #count =1
+    #for word in open("data/test_words.txt", "r"):
+    #    main_func("data/test_img"+str(count)+".txt" , str(word.strip('\n')))
+    #    count+=1
+    #print correct_char
+    #print total_char
+ 
 if __name__ == "__main__":
-    main()
+
+    main_func()
