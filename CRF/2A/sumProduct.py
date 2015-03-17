@@ -24,6 +24,8 @@ marginal_distribution = None
 correct_char = 0
 total_char = 0
 
+likelihood = 1.0
+
 def load_FP(fname):
     #loading feature parameters into a dictionary
     global FP
@@ -196,15 +198,25 @@ def predict_character(correct_word):
     total_char += len(correct_word)
     print predicted_word
         
- 
-def main_func():
+
+def average_loglikelihood(word):
+
+    global likelihood 
+    for i in xrange(0, len(word)):
+        
+        likelihood *= marginal_distribution[i][char_ordering[word[i]]]
+
+def main_func(arg1, arg2):
+    
+    fname =  arg1
+    word = arg2
 
     load_FP("model/feature-params.txt")
     load_TP("model/transition-params.txt")
 
     #Question 2.1
     print "Question 2.1"
-    compute_clique_potential(sys.argv[1], sys.argv[2])
+    compute_clique_potential(fname, word)
 
     print
     print "Question 2.2"
@@ -224,16 +236,22 @@ def main_func():
     print
     print "Question 2.5"
     #Question 2.5
-    predict_character(sys.argv[2])    
+    predict_character(word)    
    
-#def main():
-    #count =1
-    #for word in open("data/test_words.txt", "r"):
-    #    main_func("data/test_img"+str(count)+".txt" , str(word.strip('\n')))
-    #    count+=1
-    #print correct_char
-    #print total_char
+    #Question 3.5
+    average_loglikelihood(word)
+
+def main():
+    count =1
+    for word in open("data/train_words.txt", "r"):
+        main_func("data/train_img"+str(count)+".txt" , str(word.strip('\n')))
+        count+=1
+        if count == 51:
+            break
+    print correct_char
+    print total_char
+    print "average likelihod " +  str(log(likelihood)/50.0)
  
 if __name__ == "__main__":
-
-    main_func()
+    #main() #uncomment this function if you want to see results for Question 3.5
+    main_func(sys.argv[1], sys.argv[2])
