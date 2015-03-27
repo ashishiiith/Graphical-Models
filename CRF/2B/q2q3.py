@@ -4,23 +4,33 @@
 
 import os
 import sys
+import time
 import itertools
 from numpy import *
 from math import *
+import scipy
+from scipy.optimize import fmin_bfgs
+from scipy.optimize import fmin_l_bfgs_b
 
 char_ordering = {'e':0, 't':1, 'a':2, 'i':3, 'n':4, 'o':5, 's':6, 'h':7, 'r':8, 'd':9}
+y_label = {}
 
-FP = {} #feature parameter
-TP = [[0 for x in range(10)] for x in range(10)]  #transition parameter
+FP  = zeros( (10, 321) )
+TP = zeros( (10, 10) )
 
+node_potential =  None
 clique_potential = None
 beliefs = None
 size = 0
+n=10
 feat_size = 321
+num_words = None
 
 forward_msg = {}
 backward_msg = {}
+pairwise_marginal = None
 marginal_distribution = None
+xij = None
 
 correct_char = 0
 total_char = 0
@@ -49,16 +59,18 @@ def load_TP(fname):
 
 def compute_node_potential(fname):
 
+     global node_potential
+     global xij
      node_potential = []
-
+     xij = []
      for vector in open(fname, "r"):
         feature_vec = map(lambda x:float(x), vector.split())
         vec = []
         for i in xrange(0, 10):
             vec.append(dot(FP[i], feature_vec))   #dot product of feature vector and learned feature parameter from model  
         node_potential.append(vec)
-
-     print "Node Potential: " + str(node_potential) 
+        xij.append(feature_vec) 
+     #print "Node Potential: " + str(node_potential) 
      return node_potential
 
 def compute_clique_potential(fname, word):
@@ -71,19 +83,18 @@ def compute_clique_potential(fname, word):
  
      clique_potential = zeros(shape=(len(word)-1, 10 ,10))
 
-     node_potential = compute_node_potential(fname)
      for i in xrange(0, len(word)-1):
         #storing clique potential for each of the clique node
         if i == len(word)-2:          
             clique_potential[i] = matrix(node_potential[i]).T  + matrix(node_potential[i+1]) + TP
         else: 
             clique_potential[i] = matrix(node_potential[i]).T + TP
-     for i in xrange(0, len(word)-1):
-         for char1 in ['t', 'a', 'h']:
-             for char2 in ['t', 'a', 'h']:
-                 print str(clique_potential[i][char_ordering[char1]][char_ordering[char2]]) + " ",
-             print
-         print 
+     #for i in xrange(0, len(word)-1):
+     #    for char1 in ['t', 'a', 'h']:
+     #        for char2 in ['t', 'a', 'h']:
+     #            print str(clique_potential[i][char_ordering[char1]][char_ordering[char2]]) + " ",
+     #        print
+     #    print 
 
 def logsumexp(vector):
 
@@ -108,7 +119,7 @@ def sumproduct_message():
         
         for j in xrange(0, 10):
             forward_msg[i+2].append(logsumexp(array(potential[:,j]+matrix(forward_msg[i+1])).flatten()))
-        print key + ":" + str(forward_msg[i+2])
+        #print key + ":" + str(forward_msg[i+2])
    
    '''Implementing backward message passing
    '''
@@ -119,7 +130,7 @@ def sumproduct_message():
         backward_msg[i] = []
         for j in xrange(0, 10):
             backward_msg[i].append(logsumexp(array(potential[j, :] + matrix(backward_msg[i+1])).flatten()))
-        print key + ":" + str(backward_msg[i])
+        #print key + ":" + str(backward_msg[i])
 
 def logbeliefs():
     
@@ -136,14 +147,15 @@ def logbeliefs():
         else:
             beliefs[i] = clique_potential[i] + matrix(backward_msg[i+1]) + matrix(forward_msg[i+1]).T
 
-    for i in xrange(0, len(beliefs)): 
-        for ch1 in ['t', 'a']:
-            for ch2 in ['t', 'a']:
-                print ch1 + " : " + ch2 + " " + str(beliefs[i][char_ordering[ch1]][char_ordering[ch2]])
+    #for i in xrange(0, len(beliefs)): 
+    #    for ch1 in ['t', 'a']:
+    #        for ch2 in ['t', 'a']:
+    #            print ch1 + " : " + ch2 + " " + str(beliefs[i][char_ordering[ch1]][char_ordering[ch2]])
 
 def marginal_probability():
 
    global marginal_distribution
+   global pairwise_marginal
 
    l = len(beliefs)
    pairwise_marginal = zeros(shape=(l, 10, 10))
@@ -161,10 +173,9 @@ def marginal_probability():
                 #normalizing each value in belief table                
                 pairwise_marginal[i][ch1][ch2] = exp(beliefs[i][ch1][ch2])/normalizer
 
-        for ch1 in ['t', 'a', 'h']:
-            for ch2 in ['t', 'a', 'h']:
-                print ch1 + " : " + ch2 + " " + str(pairwise_marginal[i][char_ordering[ch1]][char_ordering[ch2]])
-       
+        #for ch1 in ['t', 'a', 'h']:
+        #    for ch2 in ['t', 'a', 'h']:
+        #        print ch1 + " : " + ch2 + " " + str(pairwise_marginal[i][char_ordering[ch1]][char_ordering[ch2]])   
 
         #adding up parisewise marginal probability along a row to compute marginal probability
         for j in xrange(10):
@@ -173,11 +184,11 @@ def marginal_probability():
             if i==l-1: 
                 marginal_distribution[i+1][j] = sum(pairwise_marginal[i,:,j])
    
-   for i in xrange(l+1):
-        for j in char_ordering.keys(): 
+   #for i in xrange(l+1):
+   #     for j in char_ordering.keys(): 
         
-                print str(j) + " " + str(marginal_distribution[i][char_ordering[j]]) + " ",
-        print
+   #             print str(j) + " " + str(marginal_distribution[i][char_ordering[j]]) + " ",
+   #     print
 
 def predict_character(correct_word):
 
@@ -185,8 +196,7 @@ def predict_character(correct_word):
     global total_char
     #using marginal probability to predict character for a given state
     predicted_word = ""
-    for i in xrange(0, len(marginal_distribution)):
-        
+    for i in xrange(0, len(marginal_distribution)): 
         index =  argmax(array(marginal_distribution[i]).flatten())
         for char, order in char_ordering.items():
         
@@ -197,7 +207,7 @@ def predict_character(correct_word):
         if predicted_word[j] == correct_word[j]:
             correct_char +=1 
     total_char += len(correct_word)
-    print predicted_word
+    #print predicted_word
         
 
 def average_loglikelihood(word):
@@ -207,52 +217,134 @@ def average_loglikelihood(word):
         
         likelihood *= marginal_distribution[i][char_ordering[word[i]]]
 
-def main_func(arg1, arg2):
+def partition_function():
+
+    l = []
+    for i in xrange(0,10): 
+        l.append(logsumexp(list(beliefs[0][i])))
+ 
+    return logsumexp(l)
+
+ 
+def loglikelihood(word):
     
-    fname =  arg1
-    word = arg2
-
-    load_FP("model/feature-params.txt")
-    load_TP("model/transition-params.txt")
-
-    #Question 2.1
-    print "Question 2.1"
-    compute_clique_potential(fname, word)
-
-    print
-    print "Question 2.2"
-    #Question 2.2
-    sumproduct_message()
-    
-    print
-    print "Question 2.3"
-    #Question 2.3
-    logbeliefs()
-  
-    print
-    print "Question 2.4"
-    #Question 2.4
-    marginal_probability()
-
-    print
-    print "Question 2.5"
-    #Question 2.5
-    predict_character(word)    
+    #compute energy 
+    energy = 0.0
+    for i in xrange(0, len(word)-1):
+        energy+=clique_potential[i][char_ordering[word[i]]][char_ordering[word[i+1]]]
+    logZ = partition_function()
    
-    #Question 3.5
-    average_loglikelihood(word)
+    return energy - logZ
+
+def sumProduct(fname, word):
+    
+    compute_node_potential(fname)
+    compute_clique_potential(fname, word)
+    sumproduct_message()
+    logbeliefs()
+    marginal_probability()
+    predict_character(word)
+
+def load_weights(wgts):
+   
+    global TP
+    global FP
+    
+    i = 0
+    for c in range(10):
+        for cprime in range(10):
+            TP[c][cprime] = wgts[i]
+            i += 1
+    for c in range(10):
+        for f in range(321):
+            FP[c][f] = wgts[i]
+            i += 1
+ 
+def objective_function(weights):
+ 
+    global TP
+    global FP   
+ 
+    TP = weights[0:n*n].reshape([n, n])
+    FP = weights[n*n:].reshape([n, feat_size])
+   
+    #load_weights(init_weights) 
+    count =1
+    likelihood = 0.0
+    for word in open("../2A/data/train_words.txt", "r"):
+        sumProduct("../2A/data/train_img"+str(count)+".txt" , str(word.strip('\n')))
+        likelihood += loglikelihood(str(word.strip('\n')))
+        count+=1
+        if count == num_words+1:
+            break
+    avg_likelihood = -likelihood/float(num_words)
+    return avg_likelihood
+
+def gradient_function(weights):
+
+    global TP
+    global FP
+    
+    TP = weights[0:n*n].reshape([n, n])
+    FP = weights[n*n:].reshape([n, feat_size])
+
+    gradient_feat = zeros([10, feat_size])
+    gradient_trans = zeros([10, 10])
+    
+    count = 1
+    for words in open("../2A/data/train_words.txt", "r"):
+       
+       word = str(words.strip('\n'))
+       sumProduct("../2A/data/train_img"+str(count)+".txt" , word)
+       
+       #for transition distribution
+       for i in xrange(0, size-1):
+           label1 = char_ordering[word[i]]
+           label2 = char_ordering[word[i+1]]
+           gradient_trans[label1][label2] += 1
+           for label1 in xrange(0, 10):
+               for label2 in xrange(0, 10):       
+                   gradient_trans[label1][label2] -= pairwise_marginal[i][label1][label2]
+       #print "tansition gradient\n"
+       #print gradient_trans    
+       
+       #for marginal distribution
+       #print "len xij : " +  str(word) + " " + str( len(xij))
+       for i in xrange(0, size):
+           label = char_ordering[word[i]]
+           for f in xrange(0, feat_size):
+               gradient_feat[label][f]+=xij[i][f]
+               for c in xrange(0, 10):
+                   gradient_feat[c][f] -= marginal_distribution[i][c]*xij[i][f]
+       count+=1
+       if count == num_words+1:
+           break
+    gradient_feat = concatenate(gradient_feat, axis=1)
+    gradient_trans = concatenate(gradient_trans, axis=1)
+    print -concatenate([gradient_trans, gradient_feat], axis=1)/float(num_words)
+    return -concatenate([gradient_trans, gradient_feat], axis=1)/float(num_words)
+
+
+def output_result(result):
+  
+    fd = open("result", "a")
+    for val in result:
+        fd.write(str(val) + " ")
+        fd.flush()
+    fd.close()
 
 def main():
-    count =1
-    for word in open("data/train_words.txt", "r"):
-        main_func("data/train_img"+str(count)+".txt" , str(word.strip('\n')))
+
+    t0 = time.clock()
+    global num_words
+    wgts = open("result", "r").readline().split()
+    load_weights(wgts)   
+    count = 1
+    for word in open("../2A/data/test_words.txt", "r"):
+        sumProduct("../2A/data/test_img"+str(count)+".txt" , str(word.strip('\n')))
         count+=1
-        if count == 51:
-            break
     print correct_char
     print total_char
-    print "average likelihod " +  str(log(likelihood)/50.0)
- 
+
 if __name__ == "__main__":
-    #main() #uncomment this function if you want to see results for Question 3.5
-    main_func(sys.argv[1], sys.argv[2])
+    main() #uncomment this function if you want to see results for Question 3.5

@@ -16,7 +16,6 @@ TP = [[0 for x in range(10)] for x in range(10)]  #transition parameter
 clique_potential = None
 beliefs = None
 size = 0
-feat_size = 321
 
 forward_msg = {}
 backward_msg = {}
